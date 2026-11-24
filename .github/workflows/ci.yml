@@ -2,16 +2,35 @@ name: CI
 
 on:
   push:
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.22.1
+
+      - name: Lint Helm chart
+        run: helm lint ./charts/internal-dashboard
+
+      - name: Render Helm chart
+        run: |
+          helm template dashboard ./charts/internal-dashboard \
+            --namespace dashboard \
+            > /tmp/dashboard-rendered.yaml
 
       - name: Build app image
-        run: docker buildx build .
+        run: docker build -t internal-dashboard-api:ci .
 
       - name: Build frontend image
-        run: docker buildx build ./frontend
+        run: docker build -t internal-dashboard-frontend:ci ./frontend

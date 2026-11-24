@@ -3,31 +3,40 @@ fullnameOverride: ""
 
 api:
   replicaCount: 1
+
   image:
     repository: internal-dashboard-api
     tag: local
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
+
   service:
     port: 8000
-    targetPort: 8000
+    targetPort: 8080
+
   containerPort: 8080
+
+  config:
+    APP_ENV: prod
+
   resources:
     requests:
-      cpu: 50m
-      memory: 8Mi
+      cpu: 100m
+      memory: 64Mi
     limits:
-      cpu: 200m
-      memory: 16Mi
+      cpu: 500m
+      memory: 128Mi
+
   probes:
     liveness:
-      path: /api/ready
+      path: /api/health
       port: 8080
       initialDelaySeconds: 5
       periodSeconds: 3
       timeoutSeconds: 1
       failureThreshold: 2
+
     readiness:
-      path: /api/health
+      path: /api/ready
       port: 8080
       initialDelaySeconds: 3
       periodSeconds: 3
@@ -36,19 +45,24 @@ api:
 
 web:
   replicaCount: 1
+
   image:
     repository: caddy
     tag: 2-alpine
     pullPolicy: IfNotPresent
+
   frontend:
     repository: internal-dashboard-frontend
     tag: local
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
+
   service:
     port: 80
-    targetPort: 8080
+    targetPort: 80
+
   containerPort: 80
-  caddyRoot: /srv/www/build
+
+  caddyRoot: /srv/www/dist
 
 redis:
   replicaCount: 1
@@ -62,12 +76,12 @@ ingress:
   enabled: true
   className: traefik
   host: dashboard.local
-  stripApiPrefix: true
+  stripApiPrefix: false
 
 networkPolicy:
   enabled: true
   apiIngressPort: 8080
-  redisIngressPort: 6380
+  redisIngressPort: 6379
   traefikNamespace: kube-system
 
 quota:
