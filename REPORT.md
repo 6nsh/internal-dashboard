@@ -83,7 +83,13 @@ The workflow now includes:
 - Helm lint and template checks.
 - API and frontend image builds.
 
-GitHub Actions execution has not yet been verified remotely.
+GitHub Actions passed for commit 2a01bc2 on branch
+`fix/dashboard-stack` (push-triggered CI run #2).
+
+The run completed successfully in 28 seconds. GitHub reported a
+non-blocking Node.js runtime deprecation warning for
+`actions/checkout@v4` and `azure/setup-helm@v4`.
+
 The workflow does not run the Kubernetes smoke test; runtime validation
 was performed locally in k3d.
 
@@ -239,5 +245,4 @@ measured runtime CPU or memory consumption.
 
 ## Remaining verification
 
-- Run the updated GitHub Actions workflow after pushing the branch.
 - Secret-triggered rollout has not been tested separately.
